@@ -23,6 +23,11 @@ for filename in os.listdir(KNOWN_FACES_DIR):
             name = os.path.splitext(filename)[0]
             known_face_names.append(name)
 
+# Function to remove uploaded file after processing
+def remove_uploaded_file(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
 # Route for image upload and recognition
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -95,12 +100,17 @@ def handle_face_recognition(filepath, filename):
         image_with_boxes_path = os.path.join(app.config['UPLOAD_FOLDER'], image_with_boxes_filename)
         cv2.imwrite(image_with_boxes_path, image_with_boxes)
 
+        # Remove the uploaded file after processing
+        remove_uploaded_file(filepath)
+
         # Render result template with the processed data
         if matches:
             return render_template('result.html', name=matches, image_path=image_with_boxes_filename, cropped_faces=cropped_faces)
         else:
             return render_template('result.html', message="No match found.")
     else:
+        # Remove the uploaded file after processing
+        remove_uploaded_file(filepath)
         return render_template('result.html', message="No face detected.")
 
 # Route to serve the uploaded images
