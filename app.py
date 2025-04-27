@@ -1,33 +1,40 @@
 import os
 import cv2
+import numpy as np
 from flask import Flask, render_template, request, send_from_directory, redirect, url_for
 from werkzeug.utils import secure_filename
-import face_recognition
+import insightface
 from utils import load_known_faces, crop_face, draw_face_box
 
 app = Flask(__name__)
 
-# Set up paths for uploads and known faces
+# Set up paths
 KNOWN_FACES_DIR = 'known_faces'
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Load known face encodings and names
-known_face_encodings, known_face_names = load_known_faces()
+# Initialize InsightFace model
+face_app = insightface.app.FaceAnalysis(name="buffalo_l")
+face_app.prepare(ctx_id=0, det_size=(640, 640))
+
+# Load known faces
+known_face_embeddings, known_face_names = load_known_faces()
 
 # Function to remove uploaded file after processing
 def remove_uploaded_file(file_path):
     if os.path.exists(file_path):
         os.remove(file_path)
 
-# Route for uploading image and performing recognition
+# Route: home page for upload
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         if 'image' not in request.files:
+            print("No file uploaded.")
             return render_template('result.html', message="No file uploaded.")
         file = request.files['image']
         if file.filename == '':
+            print("No file selected.")
             return render_template('result.html', message="No file selected.")
         
         filename = secure_filename(file.filename)
@@ -35,88 +42,127 @@ def index():
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
         file.save(filepath)
 
+        print(f"File uploaded: {filename}")
         return handle_face_recognition(filepath, filename)
 
     return render_template('index.html')
 
-# Function to handle face recognition
+# Core function: handle face recognition
 def handle_face_recognition(filepath, filename):
-    # Load the uploaded image
-    unknown_image = face_recognition.load_image_file(filepath)
-    unknown_encodings = face_recognition.face_encodings(unknown_image)
-    unknown_face_locations = face_recognition.face_locations(unknown_image)
+    print(f"Error: filepath {filepath}.")
+    print(f"Error: filename {filename}.")
+    img = cv2.imread(filepath)
+    if img is None:
+        print(f"Error: Failed to load the image at {filepath}.")
+        #remove_uploaded_file(filepath)
+        return render_template('result.html', message="Failed to load the uploaded image. Please try another image.")
+
+    # Log image details for debugging
+    print(f"Image Loaded: {filepath}")
+    print(f"Image shape: {img.shape if img is not None else 'None'}")
+    
+    faces = face_app.get(img)
+
+    # Log number of faces detected
+    print(f"Number of faces detected: {len(faces)}")
 
     matches = []
     cropped_faces = []
-    matched_faces = set()
 
-    image_with_boxes = cv2.imread(filepath)  # OpenCV reads in BGR format
+    if faces:
+        for face in faces:
+            embedding = face.embedding
+            # Log the embedding for debugging
+            print(f"Face embedding: {embedding[:5]}...")  # Log the first 5 values of the embedding
 
-    if unknown_encodings:
-        for i, unknown_encoding in enumerate(unknown_encodings):
-            # Get distances to all known faces
-            face_distances = face_recognition.face_distance(known_face_encodings, unknown_encoding)
-            
-            # Find the best match
-            best_match_index = face_distances.argmin()
-            best_match_distance = face_distances[best_match_index]
-            confidence_percentage = round((1 - best_match_distance) * 100, 2)
+            # Calculate cosine similarity
+            similarities = np.dot(known_face_embeddings, embedding) / (
+                np.linalg.norm(known_face_embeddings, axis=1) * np.linalg.norm(embedding)
+            )
+            best_match_index = np.argmax(similarities)
+            best_match_score = similarities[best_match_index]
             matched_name = known_face_names[best_match_index]
+            confidence_percentage = round(best_match_score * 100, 2)
 
-            # Only process if not already matched
-            if matched_name not in matched_faces:
+            # Log match info
+            print(f"Best match: {matched_name} with confidence: {confidence_percentage}%")
+
+            # add matched only when confidence is more than 50)
+
+            if confidence_percentage > 49:
                 matches.append((matched_name, confidence_percentage))
-                matched_faces.add(matched_name)
 
-                # Crop the face and save
-                top, right, bottom, left = unknown_face_locations[i]
-                cropped_face_filename = crop_face(unknown_image, top, right, bottom, left, matched_name)
+            # Crop the detected face
+            if confidence_percentage > 49:
+                bbox = face.bbox.astype(int)
+                print(f"Face bounding box: {bbox}")  # Log the bounding box coordinates
+                cropped_face_filename = crop_face(img, bbox[1], bbox[2], bbox[3], bbox[0], matched_name)
                 cropped_faces.append(cropped_face_filename)
 
-                # Draw bounding box and name with confidence
-                draw_face_box(image_with_boxes, top, right, bottom, left, f"{matched_name} ({confidence_percentage}%)")
+                # Draw rectangle and label
+                draw_face_box(img, bbox[1], bbox[2], bbox[3], bbox[0], f"{matched_name} ({confidence_percentage}%)")
 
-        # Save the boxed image
+            
+
+        # Save boxed image if faces were processed
         image_with_boxes_filename = f"boxed_{filename}"
         image_with_boxes_path = os.path.join(app.config['UPLOAD_FOLDER'], image_with_boxes_filename)
-        cv2.imwrite(image_with_boxes_path, image_with_boxes)
+        cv2.imwrite(image_with_boxes_path, img)
 
-        # Remove the uploaded original image
+        # Log image save
+        print(f"Image with boxes saved as: {image_with_boxes_filename}")
+
+        # Remove original uploaded file after processing
         remove_uploaded_file(filepath)
 
+        # Pass the matches and cropped faces correctly
         if matches:
-            # Sort matches by highest confidence
             matches.sort(key=lambda x: x[1], reverse=True)
-            best_match = matches[0]  # Take only the best match
-            return render_template('result.html', name=[best_match], image_path=image_with_boxes_filename, cropped_faces=cropped_faces)
+            print(f"Matches found: {matches}")
+            print(f"image_with_boxes_filename found: {image_with_boxes_filename}")
+            print(f"cropped_faces found: {cropped_faces}")
+            return render_template('result.html', matches=matches, image_path=image_with_boxes_filename, cropped_faces=cropped_faces)
         else:
+            print("No match found.")
             return render_template('result.html', message="No match found.")
     else:
+        print("No faces detected.")
         remove_uploaded_file(filepath)
         return render_template('result.html', message="No face detected.")
 
-# Route to serve uploaded and processed images
+
+# Route to serve uploaded images
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
+    print(f"Serving uploaded file: {filename}")
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-# Route to add a new known face
+# Route for adding a new known face
 @app.route('/add_known_face', methods=['GET', 'POST'])
 def add_known_face():
     if request.method == 'POST':
         name = request.form['name']
         files = request.files.getlist('known_faces')
         
-        os.makedirs(KNOWN_FACES_DIR, exist_ok=True)
         for file in files:
             image_path = os.path.join(KNOWN_FACES_DIR, secure_filename(file.filename))
+            os.makedirs(KNOWN_FACES_DIR, exist_ok=True)
             file.save(image_path)
 
-            image = face_recognition.load_image_file(image_path)
-            encodings = face_recognition.face_encodings(image)
-            if encodings:
-                known_face_encodings.append(encodings[0])
+            # Log the known face processing
+            print(f"Adding new known face from file: {file.filename}")
+
+            # Process new face
+            img = cv2.imread(image_path)
+            if img is None:
+                print(f"Failed to load image: {image_path}")
+                continue
+
+            faces = face_app.get(img)
+            if faces:
+                known_face_embeddings.append(faces[0].embedding)
                 known_face_names.append(name)
+                print(f"Added known face: {name}")
 
         return redirect(url_for('index'))
 
