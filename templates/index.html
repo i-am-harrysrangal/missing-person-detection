@@ -65,13 +65,12 @@
         </form>
 
         <h2>Add Known Face</h2>
-        <!-- Form to add known faces -->
         <form action="/add_known_face" method="POST" enctype="multipart/form-data">
             <input type="text" name="name" placeholder="Enter Name" required>
-            <input type="file" name="known_face" accept="image/*" required>
+            <input type="file" name="known_faces" accept="image/*" multiple required>
             <button type="submit">Upload Known Face</button>
         </form>
-        <!-- Insert this in your existing form that uploads the image -->
+
         <form action="/match_video" method="POST" enctype="multipart/form-data">
             <input type="file" name="image" accept="image/*" required>
             <br>

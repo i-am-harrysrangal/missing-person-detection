@@ -87,41 +87,56 @@ def handle_face_recognition(filepath, filename):
     img = cv2.imread(filepath)
     if img is None:
         remove_uploaded_file(filepath)
-        return render_template('result.html', message="Failed to load image.")
+        return render_template('result.html', message="Failed to load the uploaded image. Please try another image.")
     
     faces = face_app.get(img)
+
     matches = []
     cropped_faces = []
 
     if faces:
         for face in faces:
             embedding = face.embedding
+
+            # Calculate cosine similarity
             similarities = np.dot(known_face_embeddings, embedding) / (
                 np.linalg.norm(known_face_embeddings, axis=1) * np.linalg.norm(embedding)
             )
-            best_match_idx = np.argmax(similarities)
-            confidence = round(similarities[best_match_idx] * 100, 2)
-            if confidence > 49:
-                matches.append((known_face_names[best_match_idx], confidence))
-                # Crop and draw box
-                bbox = face.bbox.astype(int)
-                cropped_name = crop_face(img, bbox[1], bbox[3], bbox[0], bbox[2], known_face_names[best_match_idx])
-                cropped_faces.append(cropped_name)
-                draw_face_box(img, bbox[1], bbox[3], bbox[0], bbox[2], f"{known_face_names[best_match_idx]} ({confidence}%)")
+            best_match_index = np.argmax(similarities)
+            best_match_score = similarities[best_match_index]
+            matched_name = known_face_names[best_match_index]
+            confidence_percentage = round(best_match_score * 100, 2)
 
-        # Save image with boxes
-        output_path = os.path.join(app.config['UPLOAD_FOLDER'], f"boxed_{filename}")
-        cv2.imwrite(output_path, img)
+            # add matched only when confidence is more than 50)
+            if confidence_percentage > 49:
+                matches.append((matched_name, confidence_percentage))
+
+            # Crop the detected face
+            if confidence_percentage > 49:
+                bbox = face.bbox.astype(int)
+                cropped_face_filename = crop_face(img, bbox[1], bbox[2], bbox[3], bbox[0], matched_name)
+                cropped_faces.append(cropped_face_filename)
+
+                # Draw rectangle and label
+                draw_face_box(img, bbox[1], bbox[2], bbox[3], bbox[0], f"{matched_name} ({confidence_percentage}%)")
+
+        # Save boxed image if faces were processed
+        image_with_boxes_filename = f"boxed_{filename}"
+        image_with_boxes_path = os.path.join(app.config['UPLOAD_FOLDER'], image_with_boxes_filename)
+        cv2.imwrite(image_with_boxes_path, img)
+
+        # Remove original uploaded file after processing
         remove_uploaded_file(filepath)
 
+        # Pass the matches and cropped faces correctly
         if matches:
             matches.sort(key=lambda x: x[1], reverse=True)
-            return render_template('result.html', matches=matches, image_path=f"boxed_{filename}", cropped_faces=cropped_faces)
+            return render_template('result.html', matches=matches, image_path=image_with_boxes_filename, cropped_faces=cropped_faces)
         else:
-            return render_template('result.html', message="No matches found.")
+            return render_template('result.html', message="No match found.")
     else:
         remove_uploaded_file(filepath)
-        return render_template('result.html', message="No faces detected.")
+        return render_template('result.html', message="No face detected.")
 
 @app.route('/match_video', methods=['POST'])
 def match_video():
