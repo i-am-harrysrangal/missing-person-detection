@@ -38,8 +38,8 @@ def crop_face(image, top, right, bottom, left, filename):
     cv2.imwrite(cropped_face_path, face_image)
     return cropped_face_filename
 
-# Draw bounding box and label on image
-def draw_face_box(image, top, right, bottom, left, label):
-    cv2.rectangle(image, (left, top), (right, bottom), (0, 255, 0), 2)
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    cv2.putText(image, label, (left, top - 10), font, 0.9, (0, 255, 0), 2, cv2.LINE_AA)
+# Typical correct implementation
+def draw_face_box(image, x1, y1, x2, y2, label):
+    cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+    cv2.putText(image, label, (int(x1), int(y1)-10), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)

@@ -114,19 +114,17 @@
         }
 
         .image-wrapper {
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            overflow: hidden;
+            display: inline-block;
             border: 2px solid #ddd;
             border-radius: 10px;
             margin: 0 auto;
         }
 
         .image-wrapper img {
-            width: 100%;
+            display: block;
+            max-width: 100%;
             height: auto;
-            object-fit: contain;
+            image-rendering: auto;
         }
 
         .cropped-faces-section {
@@ -162,10 +160,6 @@
                 font-size: 16px;
                 padding: 10px 20px;
             }
-            .image-wrapper {
-                width: 100%;
-                height: auto;
-            }
             .cropped-faces img {
                 width: 80px;
                 height: 80px;
@@ -191,6 +185,17 @@
         <p class="no-match">{{ message }}</p>
     {% endif %}
 
+    {% if timestamps %}
+        <div class="results">
+            <h2>Video Match Timestamps:</h2>
+            <ul>
+                {% for ts in timestamps %}
+                    <li>{{ ts }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
     {% if matches %}
         <div class="image-container">
             <h3>Image with Detected Faces</h3>
@@ -200,18 +205,17 @@
                 {% endif %}
             </div>
         </div>
-    
 
-    <div class="cropped-faces-section">
-        <h3>Cropped Faces</h3>
-        <div class="cropped-faces">
-            {% for cropped_face in cropped_faces %}
-                {% if cropped_face %}
-                    <img src="{{ url_for('uploaded_file', filename=cropped_face) }}" alt="Cropped Face">
-                {% endif %}
-            {% endfor %}
+        <div class="cropped-faces-section">
+            <h3>Cropped Faces</h3>
+            <div class="cropped-faces">
+                {% for cropped_face in cropped_faces %}
+                    {% if cropped_face %}
+                        <img src="{{ url_for('uploaded_file', filename=cropped_face) }}" alt="Cropped Face">
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
-    </div>
     {% endif %}
 
     <a href="/" class="back-button">Back to Home</a>
