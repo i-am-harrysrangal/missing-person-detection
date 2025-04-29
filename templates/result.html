@@ -15,32 +15,51 @@
             font-family: 'Arial', sans-serif;
             background-color: #f8f9fa;
             color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            text-align: center;
-            padding: 20px;
+        }
+
+        header {
+            background: #007BFF;
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
         .container {
             background-color: #fff;
-            border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             padding: 40px;
             width: 100%;
-            max-width: 700px;
+            max-width: none;
+            margin-top: 80px;
+            margin-bottom: 120px;
         }
 
         h1 {
             color: #007BFF;
             font-size: 36px;
             margin-bottom: 20px;
+            text-align: center;
         }
 
-        h2, h3 {
-            color: #333;
-            margin-bottom: 10px;
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .result-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .results {
@@ -93,137 +112,163 @@
             transform: scale(1.05);
         }
 
-        .footer {
-            margin-top: 30px;
-            font-size: 14px;
-            color: #007BFF;
-        }
-
-        .footer a {
-            color: #007BFF;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
         .image-container {
             margin-top: 30px;
             text-align: center;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .image-wrapper {
             display: inline-block;
             border: 2px solid #ddd;
             border-radius: 10px;
-            margin: 0 auto;
+            width: 800px;
+            height: 600px;
+            overflow: hidden;
         }
 
         .image-wrapper img {
             display: block;
-            max-width: 100%;
-            height: auto;
-            image-rendering: auto;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .cropped-faces-section {
             margin-top: 30px;
             text-align: center;
+            width: 100%;
         }
 
         .cropped-faces {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .cropped-faces img {
-            width: 100px;
-            height: 100px;
+            width: 150px;
+            height: 150px;
             object-fit: cover;
             border-radius: 5px;
             border: 1px solid #ccc;
         }
 
-        /* Responsive */
-        @media (max-width: 600px) {
+        footer {
+            background: #007BFF;
+            color: white;
+            padding: 1rem;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
             .container {
                 padding: 20px;
             }
+
             h1 {
                 font-size: 28px;
             }
+
+            .image-wrapper {
+                width: 100%;
+                height: 400px;
+            }
+
+            .cropped-faces img {
+                width: 100px;
+                height: 100px;
+            }
+
             .back-button {
                 font-size: 16px;
                 padding: 10px 20px;
             }
-            .cropped-faces img {
-                width: 80px;
-                height: 80px;
+
+            .results-grid {
+                padding: 1rem;
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1 style="margin: 0; font-size: 24px; padding-left: 2rem;">Face Recognition System</h1>
+    </header>
 
-<div class="container">
-    <h1>Face Recognition Results</h1>
+    <div class="container">
+        <h1>Analysis Results</h1>
+        
+        <div class="results-grid">
+            <div class="result-section" style="grid-column: 1 / -1;">
+                {% if matches %}
+                    <div class="results">
+                        <h2>🔍 Identified Matches</h2>
+                        <ul>
+                            {% for person, confidence in matches %}
+                                <li>{{ person }} - <span class="confidence">{{ confidence }}%</span></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% elif message %}
+                    <div class="results">
+                        <p class="no-match">⚠️ {{ message }}</p>
+                    </div>
+                {% endif %}
 
-    {% if matches %}
-        <div class="results">
-            <h2>Matches Found:</h2>
-            <ul>
-                {% for person, confidence in matches %}
-                    <li>{{ person }} - <span class="confidence">{{ confidence }}%</span></li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% elif message %}
-        <p class="no-match">{{ message }}</p>
-    {% endif %}
-
-    {% if timestamps %}
-        <div class="results">
-            <h2>Video Match Timestamps:</h2>
-            <ul>
-                {% for ts in timestamps %}
-                    <li>{{ ts }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-
-    {% if matches %}
-        <div class="image-container">
-            <h3>Image with Detected Faces</h3>
-            <div class="image-wrapper">
-                {% if image_path %}
-                    <img src="{{ url_for('uploaded_file', filename=image_path) }}" alt="Image with boxes">
+                {% if timestamps %}
+                    <div class="results" style="margin-top: 2rem;">
+                        <h2>⏱ Video Match Timestamps</h2>
+                        <ul>
+                            {% for ts in timestamps %}
+                                <li>🕒 {{ ts }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 {% endif %}
             </div>
+
+            {% if matches %}
+                <div class="result-section" style="grid-column: 1 / -1;">
+                    <div class="image-container">
+                        <h3>📷 Full Analysis Image</h3>
+                        <div class="image-wrapper">
+                            {% if image_path %}
+                                <img src="{{ url_for('uploaded_file', filename=image_path) }}" alt="Image with boxes">
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="cropped-faces-section">
+                        <h3>👤 Detected Faces</h3>
+                        <div class="cropped-faces">
+                            {% for cropped_face in cropped_faces %}
+                                {% if cropped_face %}
+                                    <img src="{{ url_for('uploaded_file', filename=cropped_face) }}" alt="Cropped Face">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
 
-        <div class="cropped-faces-section">
-            <h3>Cropped Faces</h3>
-            <div class="cropped-faces">
-                {% for cropped_face in cropped_faces %}
-                    {% if cropped_face %}
-                        <img src="{{ url_for('uploaded_file', filename=cropped_face) }}" alt="Cropped Face">
-                    {% endif %}
-                {% endfor %}
-            </div>
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="/" class="back-button">🏠 Return to Dashboard</a>
         </div>
-    {% endif %}
+    </div>
 
-    <a href="/" class="back-button">Back to Home</a>
-</div>
-
-<div class="footer">
-    <p>Powered by <a href="https://github.com/your-repo">Your Repo</a></p>
-</div>
-
+    <footer>
+        <p>Powered by <a href="https://github.com/i-am-harrysrangal" style="color: white; text-decoration: underline;">GitHub Link to repository</a></p>
+    </footer>
 </body>
 </html>
