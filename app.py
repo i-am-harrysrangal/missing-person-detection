@@ -9,6 +9,7 @@ from utils import load_known_faces, crop_face, draw_face_box
 
 app = Flask(__name__)
 
+
 # Configuration
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['KNOWN_FACES_DIR'] = 'known_faces'
@@ -161,15 +162,19 @@ def match_video():
     if not video_files:
         remove_uploaded_file(filepath)
         return render_template('result.html', message="No videos found.")
-    video_path = os.path.join(app.config['VIDEO_FOLDER'], video_files[0])
+    
+    timestamps = []
+    for video_file in video_files:
+        video_path = os.path.join(app.config['VIDEO_FOLDER'], video_file)
+        video_timestamps = process_video(video_path, input_embedding)
+        for ts in video_timestamps:
+            timestamps.append(f"{video_file} - {ts}")
 
-    # Process video
-    timestamps = process_video(video_path, input_embedding)
     remove_uploaded_file(filepath)
 
     if not timestamps:
-        return render_template('result.html', message="No matches in video.")
-    return render_template('result.html', timestamps=timestamps)
+        return render_template('result.html', message="No matches in video.",video_count = len(video_files))
+    return render_template('result.html', timestamps=timestamps,video_count = len(video_files))
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
