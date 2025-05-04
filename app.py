@@ -58,6 +58,8 @@ def process_video(video_path, input_embedding):
                     timestamp = str(datetime.timedelta(seconds=int(frame_num / fps)))
                     timestamps.append(timestamp)
                     break  # Avoid duplicate timestamps per frame
+        if timestamps: #just check first match, if found break while loop
+            break
         frame_num += 1
     cap.release()
     return timestamps
@@ -134,17 +136,23 @@ def match_video():
         return render_template('result.html', message="No videos found.")
     
     timestamps = []
-    for video_file in video_files:
+    videos_scanned = 0
+    for video_file in video_files:    
+        
         video_path = os.path.join(app.config['VIDEO_FOLDER'], video_file)
+        print("pathhhhh",video_path)
         video_timestamps = process_video(video_path, input_embedding)
+        videos_scanned += 1
         for ts in video_timestamps:
             timestamps.append(f"{video_file} - {ts}")
+        if video_timestamps:
+            break
 
     remove_uploaded_file(filepath)
 
     if not timestamps:
-        return render_template('result.html', message="No matches in video.",video_count = len(video_files))
-    return render_template('result.html', timestamps=timestamps,video_count = len(video_files))
+        return render_template('result.html', message="No matches in video.",video_count = videos_scanned)
+    return render_template('result.html', timestamps=timestamps,video_count = videos_scanned)
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
