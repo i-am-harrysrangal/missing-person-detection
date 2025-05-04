@@ -1,6 +1,7 @@
 import os
 import cv2
 import insightface
+import numpy as np
 from config import KNOWN_FACES_DIR, UPLOAD_FOLDER
 
 # Initialize InsightFace model
@@ -40,3 +41,10 @@ def draw_face_box(image, top, right, bottom, left, label):
     cv2.rectangle(image, (left, top), (right, bottom), (0, 255, 0), 2)
     font = cv2.FONT_HERSHEY_SIMPLEX
     cv2.putText(image, label, (left, top - 10), font, 0.9, (0, 255, 0), 2, cv2.LINE_AA)
+
+def remove_uploaded_file(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))

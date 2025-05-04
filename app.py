@@ -5,7 +5,8 @@ import numpy as np
 from flask import Flask, render_template, request, send_from_directory, redirect, url_for
 from werkzeug.utils import secure_filename
 import insightface
-from utils import load_known_faces, crop_face, draw_face_box
+from MatchingEngine import match_image
+from utils import load_known_faces, crop_face, draw_face_box, remove_uploaded_file, cosine_similarity
 
 app = Flask(__name__)
 
@@ -26,13 +27,6 @@ face_app.prepare(ctx_id=0, det_size=(640, 640))
 
 # Pre-load known face embeddings
 known_face_embeddings, known_face_names = load_known_faces()
-
-def remove_uploaded_file(file_path):
-    if os.path.exists(file_path):
-        os.remove(file_path)
-
-def cosine_similarity(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 def get_face_embedding(image_path):
     img = cv2.imread(image_path)
@@ -85,41 +79,17 @@ def index():
     return render_template('index.html')
 
 def handle_face_recognition(filepath, filename):
+
     img = cv2.imread(filepath)
+
     if img is None:
         remove_uploaded_file(filepath)
         return render_template('result.html', message="Failed to load the uploaded image. Please try another image.")
     
     faces = face_app.get(img)
-
-    matches = []
-    cropped_faces = []
-
     if faces:
-        for face in faces:
-            embedding = face.embedding
-
-            # Calculate cosine similarity
-            similarities = np.dot(known_face_embeddings, embedding) / (
-                np.linalg.norm(known_face_embeddings, axis=1) * np.linalg.norm(embedding)
-            )
-            best_match_index = np.argmax(similarities)
-            best_match_score = similarities[best_match_index]
-            matched_name = known_face_names[best_match_index]
-            confidence_percentage = round(best_match_score * 100, 2)
-
-            # add matched only when confidence is more than 50)
-            if confidence_percentage > 49:
-                matches.append((matched_name, confidence_percentage))
-
-            # Crop the detected face
-            if confidence_percentage > 49:
-                bbox = face.bbox.astype(int)
-                cropped_face_filename = crop_face(img, bbox[1], bbox[2], bbox[3], bbox[0], matched_name)
-                cropped_faces.append(cropped_face_filename)
-
-                # Draw rectangle and label
-                draw_face_box(img, bbox[1], bbox[2], bbox[3], bbox[0], f"{matched_name} ({confidence_percentage}%)")
+        
+        matches, cropped_faces = match_image(known_face_embeddings, faces, known_face_names ,img)
 
         # Save boxed image if faces were processed
         image_with_boxes_filename = f"boxed_{filename}"
