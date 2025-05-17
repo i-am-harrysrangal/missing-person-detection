@@ -2,30 +2,27 @@ import os
 import cv2
 import insightface
 import numpy as np
-from config import KNOWN_FACES_DIR, UPLOAD_FOLDER
+from config import *
+from werkzeug.utils import secure_filename
+from pymongo.mongo_client import MongoClient
+
+# Create a new client and connect to the server
+client = MongoClient(DB_URL)
+db = client["masterDb"]
+known_faces_collection = db["known_faces"]
 
 # Initialize InsightFace model
 face_app = insightface.app.FaceAnalysis(name="buffalo_l")
 face_app.prepare(ctx_id=0, det_size=(640, 640))
 
-def load_known_faces():
-    encodings = []
-    names = []
+known_face_embeddings = []
+known_face_names = []
 
-    if not os.path.exists(KNOWN_FACES_DIR):
-        os.makedirs(KNOWN_FACES_DIR)
-
-    for filename in os.listdir(KNOWN_FACES_DIR):
-        if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.avif')):
-            img_path = os.path.join(KNOWN_FACES_DIR, filename)
-            img = cv2.imread(img_path)
-            if img is None:
-                continue
-            faces = face_app.get(img)
-            if faces:
-                encodings.append(faces[0].embedding)
-                names.append(os.path.splitext(filename)[0])
-    return encodings, names  # Return as list instead of numpy array
+def known_faces():
+    for doc in known_faces_collection.find({}):
+        known_face_embeddings.append(doc["embedding"])
+        known_face_names.append(doc["name"])
+    return known_face_embeddings,known_face_names
 
 def crop_face(image, top, right, bottom, left, filename):
     face_image = image[top:bottom, left:right]
@@ -48,3 +45,21 @@ def remove_uploaded_file(file_path):
 
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+def add_missing_person(name, files):
+    for file in files:
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(KNOWN_FACES_DIR, filename)
+        file.save(filepath)
+        
+        # Process image
+        img = cv2.imread(filepath)
+        if img is not None:
+            faces = face_app.get(img)
+            if faces:
+                embedding = faces[0].embedding.tolist()
+                # Insert directly into MongoDB
+                known_faces_collection.insert_one({
+                    "name": name,
+                    "embedding": embedding
+                })

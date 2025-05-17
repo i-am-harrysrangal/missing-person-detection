@@ -5,28 +5,15 @@ import numpy as np
 from flask import Flask, render_template, request, send_from_directory, redirect, url_for
 from werkzeug.utils import secure_filename
 import insightface
+from config import *
 from MatchingEngine import match_image
-from utils import load_known_faces, crop_face, draw_face_box, remove_uploaded_file, cosine_similarity
+from utils import remove_uploaded_file, cosine_similarity, add_missing_person
 
 app = Flask(__name__)
-
-
-# Configuration
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['KNOWN_FACES_DIR'] = 'known_faces'
-app.config['VIDEO_FOLDER'] = 'videos'
-
-# Ensure directories exist
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['KNOWN_FACES_DIR'], exist_ok=True)
-os.makedirs(app.config['VIDEO_FOLDER'], exist_ok=True)
 
 # Initialize InsightFace model
 face_app = insightface.app.FaceAnalysis(name="buffalo_l")
 face_app.prepare(ctx_id=0, det_size=(640, 640))
-
-# Pre-load known face embeddings
-known_face_embeddings, known_face_names = load_known_faces()
 
 def get_face_embedding(image_path):
     img = cv2.imread(image_path)
@@ -64,20 +51,8 @@ def process_video(video_path, input_embedding):
     cap.release()
     return timestamps
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        if 'image' not in request.files:
-            return render_template('result.html', message="No file uploaded.")
-        file = request.files['image']
-        if file.filename == '':
-            return render_template('result.html', message="No file selected.")
-        
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-
-        return handle_face_recognition(filepath, filename)
     return render_template('index.html')
 
 def handle_face_recognition(filepath, filename):
@@ -90,12 +65,10 @@ def handle_face_recognition(filepath, filename):
     
     faces = face_app.get(img)
     if faces:
-        
-        matches, cropped_faces = match_image(known_face_embeddings, faces, known_face_names ,img)
-
+        matches, cropped_faces = match_image(faces,img)
         # Save boxed image if faces were processed
         image_with_boxes_filename = f"boxed_{filename}"
-        image_with_boxes_path = os.path.join(app.config['UPLOAD_FOLDER'], image_with_boxes_filename)
+        image_with_boxes_path = os.path.join(UPLOAD_FOLDER, image_with_boxes_filename)
         cv2.imwrite(image_with_boxes_path, img)
 
         # Remove original uploaded file after processing
@@ -120,7 +93,7 @@ def match_video():
         return render_template('result.html', message="No file selected.")
     
     filename = secure_filename(file.filename)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
     file.save(filepath)
 
     # Get input face embedding
@@ -130,7 +103,7 @@ def match_video():
         return render_template('result.html', message="No face detected in image.")
 
     # Find first available video
-    video_files = [f for f in os.listdir(app.config['VIDEO_FOLDER']) if f.endswith(('.mp4', '.avi'))]
+    video_files = [f for f in os.listdir(VIDEO_FOLDER) if f.endswith(('.mp4', '.avi'))]
     if not video_files:
         remove_uploaded_file(filepath)
         return render_template('result.html', message="No videos found.")
@@ -139,8 +112,7 @@ def match_video():
     videos_scanned = 0
     for video_file in video_files:    
         
-        video_path = os.path.join(app.config['VIDEO_FOLDER'], video_file)
-        print("pathhhhh",video_path)
+        video_path = os.path.join(VIDEO_FOLDER, video_file)
         video_timestamps = process_video(video_path, input_embedding)
         videos_scanned += 1
         for ts in video_timestamps:
@@ -156,26 +128,36 @@ def match_video():
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 @app.route('/add_known_face', methods=['GET', 'POST'])
 def add_known_face():
     if request.method == 'POST':
         name = request.form['name']
-        files = request.files.getlist('known_faces')
-        for file in files:
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['KNOWN_FACES_DIR'], filename)
-            file.save(filepath)
-            # Update known embeddings
-            img = cv2.imread(filepath)
-            if img is not None:
-                faces = face_app.get(img)
-                if faces:
-                    known_face_embeddings.append(faces[0].embedding)
-                    known_face_names.append(name)
+        files = request.files.getlist('known_faces') 
+        add_missing_person(name, files)
         return redirect(url_for('index'))
     return render_template('add_known_face.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/imagerecognition', methods=['GET', 'POST'])
+def imagerecognition():
+    if request.method == 'POST':
+            if 'image' not in request.files:
+                return render_template('result.html', message="No file uploaded.")
+            file = request.files['image']
+            if file.filename == '':
+                return render_template('result.html', message="No file selected.")
+            
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(filepath)
+
+            return handle_face_recognition(filepath, filename)
+    return render_template('imagerecognition.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

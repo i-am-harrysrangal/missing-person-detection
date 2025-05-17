@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Face Recognition{% endblock %}
+
+{% block content %}
+
+<!-- Upload Form -->
+    <div class="container mt-5">
+        <div class="card p-4 shadow-lg">
+            <h2 class="feature-title text-center mb-4">🔍 Upload an Image for Recognition</h2>
+            <form action="/imagerecognition" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                    <label for="image" class="form-label">Choose an image:</label>
+                    <input type="file" class="form-control" name="image" id="image" accept="image/*" required>
+                </div>
+                <div class="d-grid gap-2 col-6 mx-auto">
+                    <button type="submit" class="btn btn-primary">Analyze Image</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

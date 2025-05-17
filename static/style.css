@@ -1,0 +1,116 @@
+@import '../../node_modules/bootstrap/';
+
+/* Original styles preserved, with additions for full-width layout */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    flex: 1;
+    width: 100%;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Original button styles preserved */
+button {
+    padding: 12px 25px;
+    font-size: 16px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+footer {
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    margin-top: auto;
+}
+
+/* Form styling enhancements */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+input[type="file"] {
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.feature-title {
+    color: #007BFF;
+    border-bottom: 2px solid #007BFF;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.custom-bg {
+  background-image: url('/static/images/coding2.jpeg.avif');
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-gradient-custom {
+  /* example gradient: blue to purple */
+  background: linear-gradient(90deg, #007bff, #6f42c1);
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #007bff, #6f42c1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.card-bg-color{
+    background-color: rgb(28, 26, 26);
+}
+
+.card-title-color{
+    color: aqua;
+}
+
+.card-hover:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    outline: 4px solid cyan;
+    outline-offset: 0px;
+}

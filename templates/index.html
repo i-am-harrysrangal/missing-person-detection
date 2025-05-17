@@ -1,139 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Recognition System</title>
-    <style>
-        /* Original styles preserved, with additions for full-width layout */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+{% extends "base.html" %}
 
-        header {
-            background: #007BFF;
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+{% block title %}Home - Face Recognition{% endblock %}
 
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-            flex: 1;
-            width: 100%;
-        }
+{% block content %}
 
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            padding: 2rem 0;
-        }
+<div class="dashboard">
 
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        /* Original button styles preserved */
-        button {
-            padding: 12px 25px;
-            font-size: 16px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        footer {
-            background: #007BFF;
-            color: white;
-            text-align: center;
-            padding: 1rem;
-            margin-top: auto;
-        }
-
-        /* Form styling enhancements */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        input[type="file"] {
-            width: 100%;
-            margin: 1rem 0;
-        }
-
-        .feature-title {
-            color: #007BFF;
-            border-bottom: 2px solid #007BFF;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>Face Recognition System</h1>
-        <p>Advanced facial recognition and analysis platform to identify missing persons</p>
-    </header>
-
-    <div class="container">
-        <div class="dashboard">
-            <!-- Recognition Card -->
-            <div class="card">
-                <h2 class="feature-title">🔍 Image Recognition</h2>
-                <form action="/" method="POST" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <input type="file" name="image" accept="image/*" required>
-                    </div>
-                    <button type="submit">Analyze Image</button>
-                </form>
-            </div>
-
-            <!-- Video Analysis Card -->
-            <div class="card">
-                <h2 class="feature-title">🎥 Video Analysis</h2>
-                <form action="/match_video" method="POST" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <input type="file" name="image" accept="image/*" required>
-                    </div>
-                    <button type="submit">Process Video</button>
-                </form>
-            </div>
-
-            <!-- Database Management Card -->
-            <div class="card">
-                <h2 class="feature-title">📁 Manage Database</h2>
-                <form action="/add_known_face" method="POST" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <input type="text" name="name" placeholder="Enter Name" 
-                               style="width: 100%; padding: 8px; margin-bottom: 1rem;" required>
-                        <input type="file" name="known_faces" accept="image/*" multiple required>
-                    </div>
-                    <button type="submit">Add New Image</button>
-                </form>
+    <!-- Image Recognition Card -->
+    <div class="card card-hover card-bg-color mb-4">
+        <img src="../static/images/facial-recognition-technology-flat-concept-spot-illustration-editable-2d-cartoon-character-on-white-for-web-design-computer-vision-algorithms-creative-idea-for-website-mobile-app-vector.jpg" class="card-img-top" alt="Image Recognition">
+        <div class="card-body">
+            <h5 class="card-title card-title-color fw-bold text-uppercase py-2">🔍 Image Recognition</h5>
+            <p class="card-text text-white">Instantly scan and match faces with our smart AI — find the missing, one photo at a time.</p>
+            <div class="d-flex justify-content-center">
+                <a href="{{ url_for('imagerecognition') }}" class="btn btn-outline-info btn-lg">Start Matching</a>
             </div>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2025 Face Recognition System. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+
+    <!-- Video Analysis Card -->
+    <div class="card mb-4">
+        <h2 class="feature-title">🎥 Video Analysis</h2>
+        <form action="/match_video" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" name="image" accept="image/*" required>
+            </div>
+            <button type="submit">Process Video</button>
+        </form>
+    </div>
+
+    <!-- Add Missing Person Card -->
+    <div class="card mb-4">
+        <h2 class="feature-title">📁 Add Missing Person</h2>
+        <form action="/add_known_face" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="text" name="name" placeholder="Enter Name" class="form-control mb-2" required>
+                <input type="file" name="known_faces" accept="image/*" multiple required>
+            </div>
+            <button type="submit">Add</button>
+        </form>
+    </div>
+
+</div>{% endblock %}
