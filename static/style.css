@@ -114,3 +114,59 @@ input[type="file"] {
     outline: 4px solid cyan;
     outline-offset: 0px;
 }
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2rem;
+    color: #fff;
+    max-width: 600px;
+    margin: auto;
+}
+.form-control, .form-control:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    box-shadow: none;
+}
+.form-control::placeholder {
+    color: #ddd;
+}
+.btn-outline-light {
+    border-color: #fff;
+    color: #fff;
+}
+.btn-outline-light:hover {
+    background-color: #fff;
+    color: #203a43;
+}
+
+.hero-bg {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+    text-align: center;
+}
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2rem;
+    color: #fff;
+}
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}

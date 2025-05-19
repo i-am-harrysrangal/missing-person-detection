@@ -18,9 +18,20 @@
         </div>
     </div>
 
+        <!-- Image Recognition Card -->
+    <div class="card card-hover card-bg-color mb-4">
+        <img src="../static/images/video_scan1.png" class="card-img-top" alt="Video Recognition">
+        <div class="card-body">
+            <h5 class="card-title card-title-color fw-bold text-uppercase py-2">🎥 Video Analysis</h5>
+            <p class="card-text text-white">Instantly scan and match faces in videos with our smart AI — frame by frame, find who matters.</p>
+            <div class="d-flex justify-content-center">
+                <a href="{{ url_for('openvideorecognition') }}" class="btn btn-outline-info btn-lg">Start Matching</a>
+            </div>
+        </div>
+    </div>
 
     <!-- Video Analysis Card -->
-    <div class="card mb-4">
+    <!-- <div class="card mb-4">
         <h2 class="feature-title">🎥 Video Analysis</h2>
         <form action="/match_video" method="POST" enctype="multipart/form-data">
             <div class="form-group">
@@ -28,7 +39,7 @@
             </div>
             <button type="submit">Process Video</button>
         </form>
-    </div>
+    </div> -->
 
     <!-- Add Missing Person Card -->
     <div class="card mb-4">

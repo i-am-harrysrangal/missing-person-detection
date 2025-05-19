@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Face Recognition{% endblock %}
+
+{% block content %}
+
+<div class="hero-section">
+    <div class="container text-center position-relative py-5">
+        <!-- Animated decoration elements -->
+        <div class="position-absolute top-0 start-0 animate__animated animate__fadeInLeft">
+            <i class="bi bi-chat-dots-fill text-primary fs-1 opacity-25"></i>
+        </div>
+        <div class="position-absolute bottom-0 end-0 animate__animated animate__fadeInRight">
+            <i class="bi bi-envelope-open-fill text-info fs-1 opacity-25"></i>
+        </div>
+
+        <!-- Main Content -->
+        <div class="py-5">
+            <h1 class="display-3 fw-bold mb-4 gradient-text">
+                Let's Connect
+                <i class="bi bi-send-arrow-up-fill text-primary ms-3"></i>
+            </h1>
+            
+            <div class="lead-container position-relative">
+                <!-- <p class="lead fs-3 text-muted mb-4">
+                    Your ideas matter! 
+                    <span class="bg-info text-black px-1">Reach out</span> and let's create something amazing
+                </p> -->
+                <p class="lead fs-3 text-muted mb-4">
+                    Your ideas matter! 
+                    Reach Out and let's create something amazing
+                </p>
+                <div class="position-absolute bottom-0 start-50 translate-middle-x">
+                    <div class="scrolling-line bg-primary"></div>
+                </div>
+            </div>
+
+            <!-- Interactive CTA -->
+            <div class="cta-box mt-4 p-3 rounded-3 d-inline-block hover-glow">
+                <a href="#contactForm" class="btn btn-lg btn-dark rounded-pill px-4 py-2">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Write Your Message
+                </a>
+            </div>
+        </div>
+
+        
+    </div>
+    
+</div>
+<div id="contactForm" class="container my-5">
+    <div class="glass-card shadow-sm">
+        <form method="post" action="/contact" novalidate>
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Your full name" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="your.email@example.com" required>
+            </div>
+            <div class="mb-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="subject" name="subject" placeholder="Brief subject" required>
+            </div>
+            <div class="mb-3">
+                <label for="message" class="form-label">Message</label>
+                <textarea class="form-control" id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-outline-light btn-lg px-5">Send Message</button>
+            </div>
+        </form>
+    </div>
+
+<style>
+    .hero-section {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(to right bottom, #f8f9fa, #ffffff);
+    }
+
+    .gradient-text {
+        background: linear-gradient(45deg, #0d6efd, #0dcaf0);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: gradientShift 5s ease infinite;
+    }
+
+    .text-highlight::after {
+        content: '';
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        width: 100%;
+        height: 8px;
+        background: rgba(13, 202, 240, 0.3);
+        z-index: -1;
+        transform: skewX(-15deg);
+    }
+
+    .scrolling-line {
+        width: 120px;
+        height: 2px;
+        animation: lineScroll 5s ease-in-out infinite;
+    }
+
+    .hover-glow {
+        transition: all 0.3s ease;
+    }
+
+    .hover-glow:hover {
+        box-shadow: 0 0 15px rgba(13, 110, 253, 0.3);
+        transform: translateY(-2px);
+    }
+
+
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes lineScroll {
+        0% { transform: translateX(-300%); }
+        100% { transform: translateX(300%); }
+    }
+
+    @keyframes mouseScroll {
+        0% { top: 5px; opacity: 1; }
+        100% { top: 20px; opacity: 0; }
+    }
+
+    @media (max-width: 768px) {
+        .display-3 {
+            font-size: 2.5rem !important;
+        }
+        .lead {
+            font-size: 1.25rem !important;
+        }
+    }
+</style>
+{% endblock %}

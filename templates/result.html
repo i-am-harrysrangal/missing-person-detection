@@ -1,276 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recognition Results</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            min-height: 100vh;
-        }
+{% block title %}Results - Face Recognition{% endblock %}
 
-        header {
-            background: #007BFF;
-            color: white;
-            padding: 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4 text-center text-primary">🔍 Analysis Results</h1>
 
-        .container {
-            background-color: #fff;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            width: 100%;
-            max-width: none;
-            margin-top: 80px;
-            margin-bottom: 120px;
-        }
-
-        h1 {
-            color: #007BFF;
-            font-size: 36px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .result-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .results {
-            width: 100%;
-            text-align: left;
-            margin-top: 20px;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            padding: 8px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        li:last-child {
-            border-bottom: none;
-        }
-
-        .confidence {
-            font-weight: bold;
-            color: #28a745;
-        }
-
-        .no-match {
-            color: #dc3545;
-            font-size: 20px;
-            margin-top: 20px;
-        }
-
-        .back-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 18px;
-            border-radius: 10px;
-            margin-top: 30px;
-            text-decoration: none;
-            display: inline-block;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s ease-in-out;
-        }
-
-        .back-button:hover {
-            background-color: #218838;
-            transform: scale(1.05);
-        }
-
-        .image-container {
-            margin-top: 30px;
-            text-align: center;
-            width: 100%;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .image-wrapper {
-            display: inline-block;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            width: 800px;
-            height: 600px;
-            overflow: hidden;
-        }
-
-        .image-wrapper img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .cropped-faces-section {
-            margin-top: 30px;
-            text-align: center;
-            width: 100%;
-        }
-
-        .cropped-faces {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .cropped-faces img {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        footer {
-            background: #007BFF;
-            color: white;
-            padding: 1rem;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 28px;
-            }
-
-            .image-wrapper {
-                width: 100%;
-                height: 400px;
-            }
-
-            .cropped-faces img {
-                width: 100px;
-                height: 100px;
-            }
-
-            .back-button {
-                font-size: 16px;
-                padding: 10px 20px;
-            }
-
-            .results-grid {
-                padding: 1rem;
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1 style="margin: 0; font-size: 24px; padding-left: 2rem;">Face Recognition System</h1>
-    </header>
-
-    <div class="container">
-        <h1>Analysis Results</h1>
-        
-        <div class="results-grid">
-            <div class="result-section" style="grid-column: 1 / -1;">
-                {% if matches %}
-                    <div class="results">
-                        <h2>🔍 Identified Matches</h2>
-                        <ul>
-                            {% for person, confidence in matches %}
-                                <li>{{ person }} - <span class="confidence">{{ confidence }}%</span></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% elif message %}
-                    <div class="results">
-                        <p class="no-match">⚠️ {{ message }}</p>
-                    </div>
-                {% endif %}
-
-                {% if timestamps %}
-                    <div class="results" style="margin-top: 2rem;">
-                        <h2>⏱ Video Match Timestamps</h2>
-                        <ul>
-                            {% for ts in timestamps %}
-                                <li>🕒 {{ ts }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-            </div>
-
+    <div class="row g-4">
+        <div class="col-12">
             {% if matches %}
-                <div class="result-section" style="grid-column: 1 / -1;">
-                    <div class="image-container">
-                        <h3>📷 Full Analysis Image</h3>
-                        <div class="image-wrapper">
-                            {% if image_path %}
-                                <img src="{{ url_for('uploaded_file', filename=image_path) }}" alt="Image with boxes">
-                            {% endif %}
-                        </div>
+                <div class="card shadow-sm border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Identified Matches</h5>
                     </div>
-
-                    <div class="cropped-faces-section">
-                        <h3>👤 Detected Faces</h3>
-                        <div class="cropped-faces">
-                            {% for cropped_face in cropped_faces %}
-                                {% if cropped_face %}
-                                    <img src="{{ url_for('uploaded_file', filename=cropped_face) }}" alt="Cropped Face">
-                                {% endif %}
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            {% for person, confidence in matches %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ person }}
+                                    <span class="badge bg-success rounded-pill">{{ confidence }}%</span>
+                                </li>
                             {% endfor %}
-                        </div>
+                        </ul>
                     </div>
+                </div>
+            {% elif message %}
+                <div class="alert alert-warning text-center" role="alert">
+                    ⚠️ {{ message }}
                 </div>
             {% endif %}
         </div>
+
         {% if timestamps %}
-            <p>Videos scanned: {{ video_count }}</p>
-        {% endif %}
-        <div style="text-align: center; margin-top: 3rem;">
-            <a href="/" class="back-button">🏠 Return to Dashboard</a>
+        <div class="col-12">
+            <div class="card shadow-sm border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">⏱ Video Match Timestamps</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for ts in timestamps %}
+                            <li class="list-group-item">🕒 {{ ts }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
+        {% endif %}
+
+        {% if matches %}
+        <div class="col-12">
+            <div class="card shadow-sm border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📷 Full Analysis Image</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if image_path %}
+                        <img src="{{ url_for('uploaded_file', filename=image_path) }}" alt="Image with boxes" class="img-fluid rounded shadow-sm">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card shadow-sm border-secondary">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">👤 Detected Faces</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for cropped_face in cropped_faces %}
+                            {% if cropped_face %}
+                            <div class="col-6 col-md-3 col-lg-2 text-center">
+                                <img src="{{ url_for('uploaded_file', filename=cropped_face) }}" alt="Cropped Face" class="img-thumbnail shadow-sm">
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
-    <footer>
-        <p>Powered by <a href="https://github.com/i-am-harrysrangal" style="color: white; text-decoration: underline;">GitHub Link to repository</a></p>
-    </footer>
-</body>
-</html>
+    {% if timestamps %}
+    <div class="col-12 my-4">
+    <div class="card shadow-sm border-light">
+        <div class="card-body text-center text-muted">
+            📁 Total Videos scanned: {{ video_count }}
+        </div>
+    </div>
+    </div>
+    {% endif %}
+
+    <div class="text-center mt-5">
+        <a href="/" class="btn btn-outline-primary btn-lg">🏠 Return to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

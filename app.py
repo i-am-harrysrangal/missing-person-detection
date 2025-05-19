@@ -84,8 +84,8 @@ def handle_face_recognition(filepath, filename):
         remove_uploaded_file(filepath)
         return render_template('result.html', message="No face detected.")
 
-@app.route('/match_video', methods=['POST'])
-def match_video():
+@app.route('/videorecognition', methods=['GET', 'POST'])
+def videorecognition():
     if 'image' not in request.files:
         return render_template('result.html', message="No file uploaded.")
     file = request.files['image']
@@ -142,6 +142,14 @@ def add_known_face():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/openvideorecognition')
+def openvideorecognition():
+    return render_template('videorecognition.html')
 
 @app.route('/imagerecognition', methods=['GET', 'POST'])
 def imagerecognition():
