@@ -6,7 +6,7 @@
 
 <div class="dashboard">
 
-    <!-- Image Recognition Card -->
+    <!-- Image Recognition -->
     <div class="card card-hover card-bg-color mb-4">
         <img src="../static/images/facial-recognition-technology-flat-concept-spot-illustration-editable-2d-cartoon-character-on-white-for-web-design-computer-vision-algorithms-creative-idea-for-website-mobile-app-vector.jpg" class="card-img-top" alt="Image Recognition">
         <div class="card-body">
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-        <!-- Image Recognition Card -->
+    <!-- Video_Recognition -->
     <div class="card card-hover card-bg-color mb-4">
         <img src="../static/images/video_scan1.png" class="card-img-top" alt="Video Recognition">
         <div class="card-body">
@@ -30,27 +30,14 @@
         </div>
     </div>
 
-    <!-- Video Analysis Card -->
-    <!-- <div class="card mb-4">
-        <h2 class="feature-title">🎥 Video Analysis</h2>
-        <form action="/match_video" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <input type="file" name="image" accept="image/*" required>
+    <div class="card card-hover card-bg-color mb-4">
+        <img src="../static/images/AddPersonImage.png" class="card-img-top" alt="Video Recognition">
+        <div class="card-body">
+            <h5 class="card-title card-title-color fw-bold text-uppercase py-2">📁 Add Missing Person</h5>
+            <p class="card-text text-white">Frame-by-Frame Forensic Analysis Starts Here: Upload a Missing Person Profile</p>
+            <div class="d-flex justify-content-center">
+                <a href="{{ url_for('AddPerson') }}" class="btn btn-outline-info btn-lg">Add</a>
             </div>
-            <button type="submit">Process Video</button>
-        </form>
-    </div> -->
-
-    <!-- Add Missing Person Card -->
-    <div class="card mb-4">
-        <h2 class="feature-title">📁 Add Missing Person</h2>
-        <form action="/add_known_face" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <input type="text" name="name" placeholder="Enter Name" class="form-control mb-2" required>
-                <input type="file" name="known_faces" accept="image/*" multiple required>
-            </div>
-            <button type="submit">Add</button>
-        </form>
+        </div>
     </div>
-
 </div>{% endblock %}

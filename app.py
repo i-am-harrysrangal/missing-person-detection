@@ -130,14 +130,40 @@ def videorecognition():
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
-@app.route('/add_known_face', methods=['GET', 'POST'])
-def add_known_face():
-    if request.method == 'POST':
-        name = request.form['name']
-        files = request.files.getlist('known_faces') 
-        add_missing_person(name, files)
-        return redirect(url_for('index'))
-    return render_template('add_known_face.html')
+@app.route('/add_person', methods=['POST'])
+def add_person():
+    # Collect form data
+    full_name = request.form['full_name']
+    person_id = request.form['person_id']
+    gender = request.form['gender']
+    upload_date = request.form['upload_date']
+    label_status = request.form.get('label_status', '')
+    tags = request.form.get('tags', '')
+    last_seen_location = request.form.get('last_seen_location', '')
+    last_seen_datetime = request.form.get('last_seen_datetime', '')
+    emergency_contact = request.form['emergency_contact']
+    remarks = request.form.get('remarks', '')
+
+    # Photo file
+    photo = request.files['photo']
+
+    # Call method to process and store
+    add_missing_person(
+        full_name=full_name,
+        person_id=person_id,
+        gender=gender,
+        photo=photo,
+        upload_date=upload_date,
+        label_status=label_status,
+        tags=tags,
+        last_seen_location=last_seen_location,
+        last_seen_datetime=last_seen_datetime,
+        emergency_contact=emergency_contact,
+        remarks=remarks
+    )
+
+    return redirect(url_for('index'))
+
 
 @app.route('/about')
 def about():
@@ -150,6 +176,10 @@ def contact():
 @app.route('/openvideorecognition')
 def openvideorecognition():
     return render_template('videorecognition.html')
+
+@app.route('/AddPerson')
+def AddPerson():
+    return render_template('AddPerson.html')
 
 @app.route('/imagerecognition', methods=['GET', 'POST'])
 def imagerecognition():

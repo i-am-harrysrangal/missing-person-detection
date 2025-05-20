@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Add Missing Person - Law-Gorithm{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="glass-card p-4">
+                <h2 class="text-center mb-4">
+                    <i class="bi bi-person-plus me-2"></i> Add Missing Person
+                </h2>
+                <form action="/add_person" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="person_id" class="form-label">Unique ID / Case ID</label>
+                        <input type="text" class="form-control" id="person_id" name="person_id" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="gender" class="form-label">Gender</label>
+                        <select class="form-select" id="gender" name="gender" required>
+                            <option value="">Select...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="photo" class="form-label">Upload Photo</label>
+                        <input type="file" class="form-control" id="photo" name="photo" accept="image/*" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="upload_date" class="form-label">Photo Upload Date</label>
+                        <input type="date" class="form-control" id="upload_date" name="upload_date" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="label_status" class="form-label">Label / Status</label>
+                        <input type="text" class="form-control" id="label_status" name="label_status" placeholder="e.g. Missing, Found, etc.">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tags" class="form-label">Tags</label>
+                        <input type="text" class="form-control" id="tags" name="tags" placeholder="e.g. Red shirt, glasses, etc.">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="last_seen_location" class="form-label">Last Seen Location</label>
+                        <input type="text" class="form-control" id="last_seen_location" name="last_seen_location">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="last_seen_datetime" class="form-label">Last Seen Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="last_seen_datetime" name="last_seen_datetime">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="emergency_contact" class="form-label">Emergency Contact Number</label>
+                        <input type="tel" class="form-control" id="emergency_contact" name="emergency_contact" pattern="[0-9]{10}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="remarks" class="form-label">Additional Remarks</label>
+                        <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle me-2"></i> Submit Details
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

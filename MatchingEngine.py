@@ -19,11 +19,19 @@ def match_image(faces, img):
             if similarity > best_match_score:
                 best_match_score = similarity
                 best_match_name = doc["name"]
+                best_match_gender = doc["gender"]
+                best_match_upload_date = doc["upload_date"]
+                best_match_label_status = doc["label_status"]
+                best_match_tags = doc["tags"]
+                best_match_last_seen_location = doc["last_seen_location"]
+                best_match_last_seen_datetime = doc["last_seen_datetime"]
+                best_match_emergency_contact = doc["emergency_contact"]
+                best_match_remarks = doc["remarks"]
 
         confidence_percentage = round(best_match_score * 100, 2)
 
         if confidence_percentage > 49:
-            matchesFound.append((best_match_name, confidence_percentage))
+            matchesFound.append((best_match_name, confidence_percentage,best_match_gender, best_match_upload_date, best_match_label_status, best_match_tags, best_match_last_seen_location, best_match_last_seen_datetime, best_match_emergency_contact, best_match_remarks))
 
             bbox = face.bbox.astype(int)
             cropped_face_filename = crop_face(img, bbox[1], bbox[2], bbox[3], bbox[0], best_match_name)

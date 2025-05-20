@@ -46,20 +46,33 @@ def remove_uploaded_file(file_path):
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
-def add_missing_person(name, files):
-    for file in files:
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(KNOWN_FACES_DIR, filename)
-        file.save(filepath)
-        
-        # Process image
-        img = cv2.imread(filepath)
-        if img is not None:
-            faces = face_app.get(img)
-            if faces:
-                embedding = faces[0].embedding.tolist()
-                # Insert directly into MongoDB
-                known_faces_collection.insert_one({
-                    "name": name,
-                    "embedding": embedding
-                })
+
+def add_missing_person(full_name, person_id, gender, photo, upload_date,
+                       label_status, tags, last_seen_location, last_seen_datetime,
+                       emergency_contact, remarks):
+    filename = secure_filename(photo.filename)
+    filepath = os.path.join(KNOWN_FACES_DIR, filename)
+    photo.save(filepath)
+
+    # Process image
+    img = cv2.imread(filepath)
+    if img is not None:
+        faces = face_app.get(img)
+        if faces:
+            embedding = faces[0].embedding.tolist()
+
+            # Save to MongoDB
+            known_faces_collection.insert_one({
+                "name": full_name,
+                "person_id": person_id,
+                "gender": gender,
+                "embedding": embedding,
+                "photo_filename": filename,
+                "upload_date": upload_date,
+                "label_status": label_status,
+                "tags": tags,
+                "last_seen_location": last_seen_location,
+                "last_seen_datetime": last_seen_datetime,
+                "emergency_contact": emergency_contact,
+                "remarks": remarks
+            })
