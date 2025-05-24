@@ -1,4 +1,5 @@
 import os
+from urllib import response
 import cv2
 import datetime
 import numpy as np
@@ -7,7 +8,8 @@ from werkzeug.utils import secure_filename
 import insightface
 from config import *
 from MatchingEngine import match_image
-from utils import remove_uploaded_file, cosine_similarity, add_missing_person
+from utils import *
+from flask import Response
 
 app = Flask(__name__)
 
@@ -168,6 +170,22 @@ def add_person():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+@app.route('/dashboard')
+def dashboard():
+    persons = getImage()
+    missin_count = totalMissingPerson()
+    found_count = totalFoundPerson()
+    return render_template('dashboard.html', persons=persons,missin_count=missin_count,found_count=found_count)
+
+@app.route('/get-image/<image_id>')
+def get_image(image_id):
+    print("jdsbfjhdbfhdbfhjdbhfb")
+    try:
+        image = imagedbid(image_id)
+        return Response(image.read(), mimetype='image/jpeg')
+    except Exception as e:
+        return f"Image not found: {str(e)}", 404
 
 @app.route('/contact')
 def contact():

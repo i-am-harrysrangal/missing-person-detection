@@ -43,7 +43,11 @@
 
                     <div class="mb-3">
                         <label for="label_status" class="form-label">Label / Status</label>
-                        <input type="text" class="form-control" id="label_status" name="label_status" placeholder="e.g. Missing, Found, etc.">
+                            <select class="form-select" id="label_status" name="label_status" required>
+                            <option value="">Select...</option>
+                            <option value="Missing">Missing</option>
+                            <option value="Found">Found</option>
+                        </select>
                     </div>
 
                     <div class="mb-3">

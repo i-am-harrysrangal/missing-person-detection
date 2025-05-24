@@ -5,11 +5,15 @@ import numpy as np
 from config import *
 from werkzeug.utils import secure_filename
 from pymongo.mongo_client import MongoClient
+from gridfs import GridFS
+from bson import ObjectId
+
 
 # Create a new client and connect to the server
 client = MongoClient(DB_URL)
 db = client["masterDb"]
 known_faces_collection = db["known_faces"]
+imagedb = GridFS(db)
 
 # Initialize InsightFace model
 face_app = insightface.app.FaceAnalysis(name="buffalo_l")
@@ -54,6 +58,9 @@ def add_missing_person(full_name, person_id, gender, photo, upload_date,
     filepath = os.path.join(KNOWN_FACES_DIR, filename)
     photo.save(filepath)
 
+    photo.seek(0)
+    image_id = imagedb.put(photo.stream, filename=filename)
+
     # Process image
     img = cv2.imread(filepath)
     if img is not None:
@@ -74,5 +81,18 @@ def add_missing_person(full_name, person_id, gender, photo, upload_date,
                 "last_seen_location": last_seen_location,
                 "last_seen_datetime": last_seen_datetime,
                 "emergency_contact": emergency_contact,
-                "remarks": remarks
+                "remarks": remarks,
+                "image_id": image_id
             })
+
+def getImage():
+    return list(known_faces_collection.find({}))
+
+def imagedbid(image_id):
+    return imagedb.get(ObjectId(image_id))
+
+def totalMissingPerson():
+    return list(known_faces_collection.find({"label_status": "Missing"}))
+
+def totalFoundPerson():
+    return list(known_faces_collection.find({"label_status": "Found"}))

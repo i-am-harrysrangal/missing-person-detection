@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="container mt-5">
+    <h1 class="text-center text-white mb-4">Missing Persons Dashboard</h1>
+
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card-hover p-4 bg-light border rounded text-center shadow-sm">
+                <h6 class="text-muted mb-1">Total Records</h6>
+                <h2 class="text-info fw-bold mb-0">{{ persons|length }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-hover p-4 bg-light border rounded text-center shadow-sm">
+                <h6 class="text-muted mb-1">Total Missing Persons</h6>
+                <h2 class="text-danger fw-bold mb-0">{{ missin_count|length }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-hover p-4 bg-light border rounded text-center shadow-sm">
+                <h6 class="text-muted mb-1">Total Found Persons</h6>
+                <h2 class="text-success fw-bold mb-0">{{ found_count|length }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="row g-4">
+            {% for person in persons %}
+            <div class="col-6">
+                <div class="card flex-row shadow-sm">
+                    <img src="{{ url_for('get_image', image_id=person.image_id) }}"
+                        class="img-fluid rounded-start"
+                        style="width: 200px; height: auto; object-fit: cover;" 
+                        alt="{{ person.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ person.name }}</h5>
+                        <p class="card-text mb-1"><strong>Status:</strong> <span class="badge {% if person.label_status == 'Found' %}bg-success{% endif %} {% if person.label_status == 'Missing' %}bg-danger{% endif %} bg-opacity-75 text-dark fs-6">{{ person.label_status }}</p>
+                        <p class="card-text mb-1"><strong>Gender:</strong> {{ person.gender }}</p>
+                        <p class="card-text mb-1"><strong>Last Seen:</strong> {{ person.last_seen_location }} ({{ person.last_seen_datetime }})</p>
+                        <p class="card-text mb-1"><strong>Tags:</strong> <span class="badge bg-info text-dark">{{ person.tags }}</span></p>
+                        <p class="card-text mb-1"><strong>Contact:</strong> {{ person.emergency_contact }}</p>
+                        <p class="card-text"><strong>Remarks:</strong> {{ person.remarks }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</main>
+{% endblock %}
