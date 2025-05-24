@@ -58,7 +58,7 @@ def index():
     return render_template('index.html')
 
 def handle_face_recognition(filepath, filename):
-
+    isImage = True
     img = cv2.imread(filepath)
 
     if img is None:
@@ -81,7 +81,7 @@ def handle_face_recognition(filepath, filename):
             matches.sort(key=lambda x: x[1], reverse=True)
             return render_template('result.html', matches=matches, image_path=image_with_boxes_filename, cropped_faces=cropped_faces)
         else:
-            return render_template('result.html', message="No match found.")
+            return render_template('result.html', message="No match found.",isImage = isImage)
     else:
         remove_uploaded_file(filepath)
         return render_template('result.html', message="No face detected.")

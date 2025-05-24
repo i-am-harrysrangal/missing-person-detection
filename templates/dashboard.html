@@ -29,7 +29,7 @@
     <div class="row mt-4">
         <div class="row g-4">
             {% for person in persons %}
-            <div class="col-6">
+            <div class="col-md-6">
                 <div class="card flex-row shadow-sm">
                     <img src="{{ url_for('get_image', image_id=person.image_id) }}"
                         class="img-fluid rounded-start"
@@ -42,7 +42,10 @@
                         <p class="card-text mb-1"><strong>Last Seen:</strong> {{ person.last_seen_location }} ({{ person.last_seen_datetime }})</p>
                         <p class="card-text mb-1"><strong>Tags:</strong> <span class="badge bg-info text-dark">{{ person.tags }}</span></p>
                         <p class="card-text mb-1"><strong>Contact:</strong> {{ person.emergency_contact }}</p>
-                        <p class="card-text"><strong>Remarks:</strong> {{ person.remarks }}</p>
+                        <p class="card-text"><strong>Remarks:</strong> <span class="card-text clamp-text mt-0">
+                        {{ person.remarks }}
+                        </span></p>
+                       
                     </div>
                 </div>
             </div>

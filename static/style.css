@@ -183,3 +183,10 @@ thead th {
 .rounded-3 {
     border-radius: 1rem !important;
 }
+.clamp-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1;
+}

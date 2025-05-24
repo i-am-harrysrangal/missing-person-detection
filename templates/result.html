@@ -55,6 +55,11 @@
                 <div class="alert alert-warning text-center" role="alert">
                     ⚠️ {{ message }}
                 </div>
+                {% if message and isImage %}
+                    <div class="d-flex justify-content-center">
+                        <a href="{{ url_for('AddPerson') }}" class="btn btn-outline-info btn-lg">Add to Database</a>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
 

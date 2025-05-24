@@ -4,19 +4,26 @@
 
 {% block content %}
 
-<!-- Upload Form -->
-    <div class="container mt-5">
-        <div class="card p-4 shadow-lg">
-            <h2 class="feature-title text-center mb-4">🔍 Upload an Image for Recognition</h2>
-            <form action="/videorecognition" method="POST" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="image" class="form-label">Choose an image:</label>
-                    <input type="file" class="form-control" name="image" id="image" accept="image/*" required>
-                </div>
-                <div class="d-grid gap-2 col-6 mx-auto">
-                    <button type="submit" class="btn btn-primary">scan</button>
-                </div>
-            </form>
+    <div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="glass-card p-4">
+                <h2 class="text-center mb-4">
+                    <i class="bi bi-search-heart me-2"></i> Match Face In Video
+                </h2>
+                <form action="/videorecognition" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Select an Image</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-light btn-lg">
+                            <i class="bi bi-activity me-2"></i> Scan
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+</div>
 {% endblock %}
