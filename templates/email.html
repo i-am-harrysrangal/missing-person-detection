@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block title %}Email Phishing Detector - Law-Gorithm{% endblock %}
+
+{% block content %}
+<style>
+    .phishing-container {
+        background: linear-gradient(135deg, #5a67d8, #6c43b8);
+        min-height: 100vh;
+        padding: 2rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Background decorations */
+    .bg-deco {
+        position: absolute;
+        opacity: 0.1;
+        z-index: 0;
+    }
+    
+    .bg-deco-1 {
+        top: 10%;
+        left: 5%;
+        font-size: 15rem;
+        transform: rotate(15deg);
+    }
+    
+    .bg-deco-2 {
+        bottom: 15%;
+        right: 8%;
+        font-size: 12rem;
+        transform: rotate(-20deg);
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(16px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 
+            0 15px 35px rgba(0, 0, 0, 0.25),
+            inset 0 0 10px rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    }
+
+    .glass-card:hover {
+        box-shadow: 
+            0 20px 40px rgba(0, 0, 0, 0.3),
+            inset 0 0 15px rgba(255, 255, 255, 0.15);
+        transform: translateY(-5px);
+    }
+
+    .header-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: float 4s ease-in-out infinite;
+        text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .input-card {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .input-card:focus-within {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.35);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    textarea {
+        background: transparent !important;
+        border: none !important;
+        color: white !important;
+        resize: vertical;
+        min-height: 220px;
+        font-size: 1.05rem;
+    }
+
+    textarea::placeholder {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    textarea:focus {
+        box-shadow: none !important;
+        outline: none;
+    }
+
+    .analyze-btn {
+        background: linear-gradient(45deg, #ff9a00, #ff6a00);
+        border: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        padding: 1rem 2rem;
+        font-size: 1.2rem;
+        box-shadow: 0 5px 15px rgba(255, 106, 0, 0.3);
+    }
+
+    .analyze-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 106, 0, 0.4);
+    }
+
+    .analyze-btn:after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -60%;
+        width: 20px;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(30deg);
+        transition: all 0.8s;
+    }
+
+    .analyze-btn:hover:after {
+        left: 120%;
+    }
+
+    .result-card {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        transition: all 0.4s ease;
+    }
+
+    .result-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    .analysis-content {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        white-space: pre-wrap;
+        font-family: 'Courier New', monospace;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        max-height: 500px;
+        overflow-y: auto;
+        padding: 1.5rem;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    }
+
+    .analysis-content::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .analysis-content::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+    }
+
+    .result-label {
+        display: inline-block;
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+    }
+
+    .result-phishing {
+        background: rgba(220, 53, 69, 0.25);
+        color: #ff6b6b;
+    }
+
+    .result-legit {
+        background: rgba(40, 167, 69, 0.25);
+        color: #51cf66;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes glow {
+        0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.3); }
+        50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+        100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.3); }
+    }
+
+    .glow {
+        animation: glow 3s infinite ease-in-out;
+    }
+
+    .info-tips {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 1.5rem;
+    }
+
+    .tip-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .tip-icon {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        min-width: 30px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-3px);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(to right, #ff9a00, #ff6a00);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+</style>
+
+<div class="phishing-container">
+    <!-- Background decorations -->
+    <div class="bg-deco bg-deco-1">📧</div>
+    <div class="bg-deco bg-deco-2">🔍</div>
+    
+    <div class="container py-4">
+        <div class="glass-card mx-auto p-4 p-lg-5 fade-in">
+            <div class="row">
+                <!-- Main Content Column -->
+                <div class="col-lg-8">
+                    <div class="text-center mb-4">
+                        <div class="header-icon">📧</div>
+                        <h1 class="mb-3 display-4 fw-bold">Email Phishing Detector</h1>
+                        <p class="mb-0 lead opacity-85">Protect yourself from email scams with AI-powered analysis</p>
+                    </div>
+                    
+                    <form method="POST">
+                        <div class="mb-4 input-card p-3 glow">
+                            <label for="email" class="form-label mb-2 fw-medium fs-5">Email Content:</label>
+                            <textarea name="email" class="form-control p-3 fs-5" 
+                                    placeholder="Paste suspicious email content here..." required></textarea>
+                        </div>
+                        
+                        <div class="d-grid mb-5">
+                            <button type="submit" class="btn analyze-btn btn-lg py-3">
+                                🔍 Analyze Email Content
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if result %}
+                    <div class="result-card mt-4 p-4 p-lg-5 fade-in">
+                        <div class="d-flex align-items-center mb-4">
+                            <h4 class="mb-0 me-3">Analysis Result:</h4>
+                            <span class="result-label {% if result == 'Phishing Detected' %}result-phishing{% else %}result-legit{% endif %}">
+                                {{ result }}
+                            </span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h5 class="d-flex align-items-center">
+                                <span class="me-2">🔬</span> 
+                                Email Analysis:
+                            </h5>
+                        </div>
+                        
+                        <div class="analysis-content">
+                            {{ analysis_html | safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Sidebar Column -->
+                <div class="col-lg-4 mt-5 mt-lg-0">
+                    <div class="info-tips mb-4">
+                        <h4 class="mb-3 d-flex align-items-center">
+                            <span class="me-2">💡</span> 
+                            Phishing Prevention Tips
+                        </h4>
+                        
+                        <div class="tip-item">
+                            <div class="tip-icon">🔒</div>
+                            <div>
+                                <h5 class="mb-1">Check the Sender</h5>
+                                <p class="mb-0 opacity-85">Verify email addresses - scammers often use look-alike domains</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tip-item">
+                            <div class="tip-icon">⚠️</div>
+                            <div>
+                                <h5 class="mb-1">Urgency Tactics</h5>
+                                <p class="mb-0 opacity-85">Be wary of emails creating a false sense of urgency</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tip-item">
+                            <div class="tip-icon">🔗</div>
+                            <div>
+                                <h5 class="mb-1">Hover Before Clicking</h5>
+                                <p class="mb-0 opacity-85">Always hover over links to see the actual destination URL</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tip-item">
+                            <div class="tip-icon">📎</div>
+                            <div>
+                                <h5 class="mb-1">Suspicious Attachments</h5>
+                                <p class="mb-0 opacity-85">Never open unexpected attachments, especially .exe files</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">92%</div>
+                            <div>of cyber attacks</div>
+                            <div>start with email</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-value">1.2M</div>
+                            <div>phishing sites</div>
+                            <div>created monthly</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-value">$12B</div>
+                            <div>annual losses</div>
+                            <div>from phishing</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4 text-white-50">
+            <p class="mb-0">Powered by Gemini AI • Always verify suspicious emails through official channels</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add animation to the input card on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputCard = document.querySelector('.input-card');
+        if (inputCard) {
+            setTimeout(() => {
+                inputCard.classList.add('glow');
+            }, 500);
+        }
+    });
+</script>
+{% endblock %}

@@ -48,6 +48,22 @@
                 </a>
             </div>
             
+
+            
+            <div class="nav-item {% if request.path == '/email' %}active{% endif %}">
+                <a href="/email">
+                    <i class="fa-solid fa-envelope-circle-check"></i>
+                    <span>Phishing Email Detector</span>
+                    <div class="indicator"></div>
+                </a>
+            </div>   
+                        <div class="nav-item {% if request.path == '/chat' %}active{% endif %}">
+                <a href="/chat">
+                    <i class="fas fa-comment-dots"></i>
+                    <span>Law-Buddy</span>
+                    <div class="indicator"></div>
+                </a>
+            </div>     
             <div class="nav-item {% if request.path == '/about' %}active{% endif %}">
                 <a href="/about">
                     <i class="fas fa-circle-info"></i>
@@ -63,15 +79,7 @@
                     <div class="indicator"></div>
                 </a>
             </div>
-            
-            <div class="nav-item {% if request.path == '/chat' %}active{% endif %}">
-                <a href="/chat">
-                    <i class="fas fa-comment-dots"></i>
-                    <span>Law-Buddy</span>
-                    <div class="indicator"></div>
-                </a>
-            </div>      
-             <div id="google_translate_element" class="mb-3"></div>      
+             <div id="google_translate_element" class="mt-5"></div>      
         </div> 
     </div>
 

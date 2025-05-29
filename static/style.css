@@ -487,3 +487,10 @@ thead th {
             100% { background-position: 0% 50%; }
         }
         
+        #google_translate_element {
+            position: fixed;
+            bottom: 10px; /* distance from bottom */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999; /* keep it above other elements */
+        }

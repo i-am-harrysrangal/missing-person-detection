@@ -4,6 +4,7 @@ import cv2
 import datetime
 import numpy as np
 import random
+import markdown
 from flask import Flask, render_template, request, send_from_directory, redirect, url_for, jsonify, session
 from werkzeug.utils import secure_filename
 import insightface
@@ -13,12 +14,14 @@ from utils import *
 from flask import Response
 import requests
 from dotenv import load_dotenv
+import google.generativeai as genai
 
 app = Flask(__name__)
 
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "super-secret-key") 
 API_KEY = os.getenv("GEMINI_API_KEY")
 API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent"
+
 
 headers = {
     "Content-Type": "application/json"
@@ -279,6 +282,72 @@ def chatbot():
     else:
         return jsonify({'reply': '❌ Gemini API error: ' + str(response.status_code)})
 
+
+@app.route("/email", methods=["GET", "POST"])
+def email():
+    result = None
+    analysis = None
+    analysis_html = None
+
+    if request.method == "POST":
+        email_text = request.form["email"]
+
+            # Initialize chat history if not present
+        if 'chat_history' not in session:
+            session['chat_history'] = []
+            
+        session['chat_history'].append({
+            "role": "user",
+            "parts": [{"text": email_text}]
+        })
+
+        # Prepare payload with history
+        payload = {
+            "contents": session['chat_history']
+        }
+
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        prompt = f"""
+                    Analyze the following email and determine if it's a phishing attempt. 
+                    
+                    **Response Requirements:**
+                    1. If phishing is detected:
+                    - State that it's a phishing attempt
+                    - Begin your explanation with the word "Artifice"
+                    - Explain the phishing indicators found
+                    - Provide security recommendations
+                    
+                    2. If no phishing is detected:
+                    - State that it appears legitimate
+                    - Explain why it doesn't show phishing characteristics
+                    - Do not include the word "Artifice" anywhere in your response
+                    
+                    **Email Content:**
+                    {email_text}
+                    """
+        session['chat_history'].append({
+            "role": "user",
+            "parts": [{"text": prompt}]
+        })
+
+        # Prepare payload with history
+        payload = {
+            "contents": session['chat_history']
+        }
+
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        response = requests.post(f"{API_URL}?key={API_KEY}", headers=headers, json=payload)
+        #response = model.generate_content(prompt)
+        analysis = response.json()['candidates'][0]['content']['parts'][0]['text']
+        analysis_html = markdown.markdown(analysis)
+        result = "Phishing Detected ⚠️" if "artifice" in analysis_html.lower() else "No Phishing Detected ✅"
+    return render_template("email.html", result=result, analysis_html=analysis_html)
 
 if __name__ == '__main__':
     app.run(debug=True)
