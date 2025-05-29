@@ -3,15 +3,26 @@ from urllib import response
 import cv2
 import datetime
 import numpy as np
-from flask import Flask, render_template, request, send_from_directory, redirect, url_for
+import random
+from flask import Flask, render_template, request, send_from_directory, redirect, url_for, jsonify, session
 from werkzeug.utils import secure_filename
 import insightface
 from config import *
 from MatchingEngine import match_image
 from utils import *
 from flask import Response
+import requests
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "super-secret-key") 
+API_KEY = os.getenv("GEMINI_API_KEY")
+API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent"
+
+headers = {
+    "Content-Type": "application/json"
+}
 
 # Initialize InsightFace model
 face_app = insightface.app.FaceAnalysis(name="buffalo_l")
@@ -176,7 +187,14 @@ def dashboard():
     persons = getImage()
     missin_count = totalMissingPerson()
     found_count = totalFoundPerson()
-    return render_template('dashboard.html', persons=persons,missin_count=missin_count,found_count=found_count)
+
+    # Generate sample data
+    labels = ['January', 'February', 'March', 'April', 'May', 'June']
+    data = [random.randint(1, 100) for _ in range(6)]
+
+
+    return render_template('dashboard.html', persons=persons,missin_count=missin_count,found_count=found_count,
+                           labels=labels,data=data)
 
 @app.route('/get-image/<image_id>')
 def get_image(image_id):
@@ -214,6 +232,53 @@ def imagerecognition():
 
             return handle_face_recognition(filepath, filename)
     return render_template('imagerecognition.html')
+
+
+@app.route('/chat')
+def chat():
+    return render_template('chat.html')
+
+
+@app.route('/chatbot', methods=['POST'])
+def chatbot():
+    user_input = request.json['message']
+
+    # Initialize chat history if not present
+    if 'chat_history' not in session:
+        session['chat_history'] = []
+
+    # Add user message to history
+    session['chat_history'].append({
+        "role": "user",
+        "parts": [{"text": user_input}]
+    })
+
+    # Prepare payload with history
+    payload = {
+        "contents": session['chat_history']
+    }
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    # Send request to Gemini
+    response = requests.post(f"{API_URL}?key={API_KEY}", headers=headers, json=payload)
+
+    if response.status_code == 200:
+        reply = response.json()['candidates'][0]['content']['parts'][0]['text']
+
+        # Add Gemini reply to chat history
+        session['chat_history'].append({
+            "role": "model",
+            "parts": [{"text": reply}]
+        })
+
+        session.modified = True  # Mark session as updated
+        return jsonify({'reply': reply})
+    else:
+        return jsonify({'reply': '❌ Gemini API error: ' + str(response.status_code)})
+
 
 if __name__ == '__main__':
     app.run(debug=True)

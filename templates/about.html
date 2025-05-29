@@ -4,43 +4,65 @@
 
 {% block content %}
 
-<div class="hero-bg">
-    <div class="container">
-        <h1 class="display-4 fw-bold mb-3">Meet the Mission</h1>
-        <p class="lead">Our AI-powered platform is built to help reunite lives through fast, secure, and intelligent face recognition.</p>
+<div class="hero-bg rounded-3 mb-3">
+        <div class="icon-circle bg-gradient-custom" style="width: 120px; height: 120px;">
+            <i class="fas fa-heart fa-3x text-white"></i>
+    </div>
+    <div class="container py-5">
+        <h1 class="display-4 fw-bold mb-3 gradient-text">Meet the Mission</h1>
+        <p class="lead fs-3">Our AI-powered platform is built to help reunite lives through fast, secure, and intelligent face recognition.</p>
     </div>
 </div>
 
 <div class="container my-5">
+    <!-- Features Section -->
+    <h2 class="gradient-text text-center mb-5">How We Help</h2>
     <div class="row g-4 justify-content-center">
         <div class="col-md-6 col-lg-4">
-            <div class="glass-card text-center shadow-sm h-100">
-                <div class="icon-circle"><i class="bi bi-person-bounding-box"></i></div>
-                <h5>AI Face Matching</h5>
+            <div class="glass-card text-center shadow-sm h-100 card-hover">
+                <div class="icon-circle"><i class="fas fa-user-circle fa-2x"></i></div>
+                <h5 class="card-title-color">AI Face Matching</h5>
                 <p>Advanced algorithms match faces from images and videos, helping identify missing persons in seconds.</p>
             </div>
         </div>
         <div class="col-md-6 col-lg-4">
-            <div class="glass-card text-center shadow-sm h-100">
-                <div class="icon-circle"><i class="bi bi-camera-reels"></i></div>
-                <h5>Video Scanning</h5>
+            <div class="glass-card text-center shadow-sm h-100 card-hover">
+                <div class="icon-circle"><i class="fas fa-video fa-2x"></i></div>
+                <h5 class="card-title-color">Video Scanning</h5>
                 <p>Our engine scans entire videos for matches and marks exact timestamps — enabling real-time investigations.</p>
             </div>
         </div>
         <div class="col-md-6 col-lg-4">
-            <div class="glass-card text-center shadow-sm h-100">
-                <div class="icon-circle"><i class="bi bi-shield-lock"></i></div>
-                <h5>Secure & Ethical</h5>
+            <div class="glass-card text-center shadow-sm h-100 card-hover">
+                <div class="icon-circle"><i class="fas fa-lock fa-2x"></i></div>
+                <h5 class="card-title-color">Secure & Ethical</h5>
                 <p>Every search is encrypted, consent-based, and compliant with privacy norms to protect identities.</p>
             </div>
         </div>
-    </div>
-
-    <div class="text-center mt-5">
-        <a href="/" class="btn btn-outline-light btn-lg">🏠 Back to Dashboard</a>
+        
+        <!-- Additional Features -->
+        <div class="col-md-6 col-lg-4">
+            <div class="glass-card text-center shadow-sm h-100 card-hover">
+                <div class="icon-circle"><i class="fas fa-bolt fa-2x"></i></div>
+                <h5 class="card-title-color">Real-time Processing</h5>
+                <p>Instant results with our high-performance engine that processes images in milliseconds.</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="glass-card text-center shadow-sm h-100 card-hover">
+                <div class="icon-circle"><i class="fas fa-database fa-2x"></i></div>
+                <h5 class="card-title-color">Massive Database</h5>
+                <p>Access to millions of indexed faces while maintaining strict privacy protocols.</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="glass-card text-center shadow-sm h-100 card-hover">
+                <div class="icon-circle"><i class="fas fa-chart-line fa-2x"></i></div>
+                <h5 class="card-title-color">Continuous Learning</h5>
+                <p>Our AI improves with every search, becoming more accurate over time.</p>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Bootstrap Icons CDN (if not already included in base.html) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 {% endblock %}
