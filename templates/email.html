@@ -269,11 +269,11 @@
                 <div class="col-lg-8">
                     <div class="text-center mb-4">
                         <div class="header-icon">📧</div>
-                        <h1 class="mb-3 display-4 fw-bold">Email Phishing Detector</h1>
+                        <h1 class="mb-3 display-4 fw-bold">Phish Inspector</h1>
                         <p class="mb-0 lead opacity-85">Protect yourself from email scams with AI-powered analysis</p>
                     </div>
                     
-                    <form method="POST">
+                    <form method="POST" onsubmit="showSpinner(); return true;">
                         <div class="mb-4 input-card p-3 glow">
                             <label for="email" class="form-label mb-2 fw-medium fs-5">Email Content:</label>
                             <textarea name="email" class="form-control p-3 fs-5" 
@@ -286,6 +286,13 @@
                             </button>
                         </div>
                     </form>
+
+                    <div id="loadingSpinner" class="d-none text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Processing...</p>
+                    </div>
 
                     {% if result %}
                     <div class="result-card mt-4 p-4 p-lg-5 fade-in">
@@ -390,5 +397,9 @@
             }, 500);
         }
     });
+
+    function showSpinner() {
+        document.getElementById("loadingSpinner").classList.remove("d-none");
+    }
 </script>
 {% endblock %}
